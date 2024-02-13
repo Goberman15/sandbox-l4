@@ -2,11 +2,11 @@ package main
 
 import (
 	"log"
-	"net/http"
 
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/go-chi/chi/v5"
 	"github.com/goberman15/sandbox-l4/router"
-	_ "github.com/jackc/pgx/v4/stdlib"
+	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -44,11 +44,13 @@ func main() {
 		log.Fatalf("fail to initialize database: %v", err)
 	}
 
+	app := fiber.New()
+
 	r := chi.NewRouter()
 
 	r.Mount("/api/items", router.NewItemRouter(db))
 	r.Mount("/api/item-details", router.NewItemDetailRouter(db))
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(app.Listen(":8080"))
 
 }
