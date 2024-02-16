@@ -1,12 +1,11 @@
 package controller
 
 import (
-	"encoding/json"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/goberman15/sandbox-l4/model"
 	"github.com/goberman15/sandbox-l4/repository"
+	"github.com/gofiber/fiber/v2"
 )
 
 type ItemController struct {
@@ -17,119 +16,86 @@ func NewItemController(r repository.ItemRepo) *ItemController {
 	return &ItemController{r}
 }
 
-func (c *ItemController) ListItems(w http.ResponseWriter, r *http.Request) {
+func (c *ItemController) ListItems(ctx *fiber.Ctx) error {
 	items, err := c.r.ListItems()
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	err = json.NewEncoder(w).Encode(items)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	// w.WriteHeader(http.StatusOK)
+	return ctx.Status(http.StatusOK).JSON(items)
 }
 
-func (c *ItemController) CreateItem(w http.ResponseWriter, r *http.Request) {
+func (c *ItemController) CreateItem(ctx *fiber.Ctx) error {
 	var item model.Item
-	err := json.NewDecoder(r.Body).Decode(&item)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+
+	if err := ctx.BodyParser(&item); err != nil {
+		return err
 	}
 
-	err = c.r.CreateItem(item.Name)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+	if err := c.r.CreateItem(item.Name); err != nil {
+		return err
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("Success Create Item"))
+	return ctx.Status(http.StatusCreated).JSON(item)
 }
 
-func (c *ItemController) GetItemById(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+func (c *ItemController) GetItemById(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
 	item, err := c.r.GetItem(id)
 	if err != nil {
 		if err.Error() == "item not found" {
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(err.Error()))
-			return
+			return ctx.Status(http.StatusNotFound).JSON(fiber.Map{
+				"error": err.Error(),
+			})
 		}
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+
+		return err
 	}
 
-	json.NewEncoder(w).Encode(item)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	return ctx.Status(http.StatusOK).JSON(item)
 }
 
-func (c *ItemController) UpdateItemStatus(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+func (c *ItemController) UpdateItemStatus(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
 	var item model.Item
-	err := json.NewDecoder(r.Body).Decode(&item)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+
+	if err := ctx.BodyParser(&item); err != nil {
+		return err
 	}
 
-	err = c.r.UpdateItemField(id, "status", item.Status)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+	if err := c.r.UpdateItemField(id, "status", item.Status); err != nil {
+		return err
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Success Update Item Status"))
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "Success Update Item Status",
+	})
 }
 
-func (c *ItemController) UpdateItemAmount(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
+func (c *ItemController) UpdateItemAmount(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
 	var item model.Item
-	err := json.NewDecoder(r.Body).Decode(&item)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+
+	if err := ctx.BodyParser(&item); err != nil {
+		return err
 	}
 
-	err = c.r.UpdateItemField(id, "amount", item.Amount)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+	if err := c.r.UpdateItemField(id, "amount", item.Amount); err != nil {
+		return err
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Success Update Item Amount"))
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "Success Update Item Amount",
+	})
 }
 
-func (c *ItemController) DeleteItem(w http.ResponseWriter, r *http.Request) {
-	id := chi.URLParam(r, "id")
-	err := c.r.DeleteItem(id)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(err.Error()))
-		return
+func (c *ItemController) DeleteItem(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+	if err := c.r.DeleteItem(id); err != nil {
+		return err
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Success Delete Item"))
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"message": "Success Delete Item",
+	})
 }

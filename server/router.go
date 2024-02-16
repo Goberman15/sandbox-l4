@@ -1,9 +1,9 @@
-package router
+package server
 
 import "github.com/gofiber/fiber/v2"
 
-func RegisterRouter(app *fiber.App) {
-	api := app.Group("/api")
+func (s *Server) RegisterRouter() {
+	api := s.app.Group("/api")
 
 	api.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
@@ -14,6 +14,6 @@ func RegisterRouter(app *fiber.App) {
 	itemRouter := api.Group("/items")	
 	itemDetailRouter := api.Group("/item-details")	
 
-	registerItemRouter(itemRouter)
-	registerItemDetailRouter(itemDetailRouter)
+	registerItemRouter(itemRouter, s.db)
+	registerItemDetailRouter(itemDetailRouter, s.db)
 }

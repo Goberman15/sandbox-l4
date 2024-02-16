@@ -3,8 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/goberman15/sandbox-l4/router"
-	"github.com/gofiber/fiber/v2"
+	"github.com/goberman15/sandbox-l4/server"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
 )
@@ -35,17 +34,16 @@ func main() {
 	if err != nil {
 		log.Fatalf("cannot connect to database: %v", err)
 	}
-
 	defer db.Close()
 
 	err = initDB(db)
 	if err != nil {
 		log.Fatalf("fail to initialize database: %v", err)
 	}
-	app := fiber.New()
+	
+	s := server.NewServer(db)
+	s.RegisterRouter()
 
-	router.RegisterRouter(app)
-
-	log.Fatal(app.Listen(":8080"))
+	log.Fatal(s.Start())
 
 }
