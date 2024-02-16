@@ -44,8 +44,7 @@ func main() {
 	}
 	app := fiber.New()
 
-	api := app.Group("/api")
-	router.RegisterRouter(api)
+	router.RegisterRouter(app)
 
 	log.Fatal(app.Listen(":8080"))
 

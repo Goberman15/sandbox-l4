@@ -4,13 +4,13 @@ go 1.21.1
 
 require (
 	github.com/go-chi/chi/v5 v5.0.11
+	github.com/gofiber/fiber/v2 v2.52.0
 	github.com/jackc/pgx/v4 v4.18.1
 	github.com/jmoiron/sqlx v1.3.5
 )
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/gofiber/fiber/v2 v2.52.0 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.14.0 // indirect
