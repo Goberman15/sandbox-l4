@@ -35,7 +35,7 @@ func (c *ItemDetailController) CreateItemDetail(ctx *fiber.Ctx) error {
 }
 
 func (c *ItemDetailController) ListItemDetailByItemId(ctx *fiber.Ctx) error {
-	itemId, err := ctx.ParamsInt("id")
+	itemId, err := ctx.ParamsInt("itemId")
 	if err != nil {
 		return customErr.NewBadRequestError("invalid item id")
 	}
