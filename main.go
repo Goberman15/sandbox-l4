@@ -45,5 +45,4 @@ func main() {
 	s.RegisterRouter()
 
 	log.Fatal(s.Start())
-
 }

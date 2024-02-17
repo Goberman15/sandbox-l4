@@ -6,8 +6,8 @@ import (
 
 type ItemDetailRepo interface {
 	CreateItemDetail(string, int) error
-	ListItemDetailById(string) ([]*model.ItemDetail, error)
-	GetItemDetail(string) (*model.ItemDetail, error)
-	UpdateItemDetail(string, string) error
-	DeleteItemDetail(string, int) error
+	ListItemDetailById(int) ([]*model.ItemDetail, error)
+	GetItemDetail(int) (*model.ItemDetail, error)
+	UpdateItemDetail(int, string) error
+	DeleteItemDetail(int, int) error
 }

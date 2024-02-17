@@ -7,7 +7,7 @@ import (
 type ItemRepo interface {
 	CreateItem(string) error
 	ListItems() ([]*model.Item, error)
-	GetItem(string) (*model.Item, error)
-	UpdateItemField(string, string, any) error
-	DeleteItem(string) error
+	GetItem(int) (*model.Item, error)
+	UpdateItemField(int, string, any) error
+	DeleteItem(int) error
 }

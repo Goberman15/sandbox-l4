@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/goberman15/sandbox-l4/customErr"
 	"github.com/goberman15/sandbox-l4/model"
 	"github.com/goberman15/sandbox-l4/repository"
 	"github.com/gofiber/fiber/v2"
@@ -36,19 +37,18 @@ func (c *ItemController) CreateItem(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	return ctx.Status(http.StatusCreated).JSON(item)
+	return ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"message": "Success Create Item",
+	})
 }
 
 func (c *ItemController) GetItemById(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
+	id, err := ctx.ParamsInt("id")
+	if err != nil {
+		return customErr.NewBadRequestError("invalid id")
+	}
 	item, err := c.r.GetItem(id)
 	if err != nil {
-		if err.Error() == "item not found" {
-			return ctx.Status(http.StatusNotFound).JSON(fiber.Map{
-				"error": err.Error(),
-			})
-		}
-
 		return err
 	}
 
@@ -56,7 +56,11 @@ func (c *ItemController) GetItemById(ctx *fiber.Ctx) error {
 }
 
 func (c *ItemController) UpdateItemStatus(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
+	id, err := ctx.ParamsInt("id")
+	if err != nil {
+		return customErr.NewBadRequestError("invalid id")
+	}
+
 	var item model.Item
 
 	if err := ctx.BodyParser(&item); err != nil {
@@ -73,7 +77,11 @@ func (c *ItemController) UpdateItemStatus(ctx *fiber.Ctx) error {
 }
 
 func (c *ItemController) UpdateItemAmount(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
+	id, err := ctx.ParamsInt("id")
+	if err != nil {
+		return customErr.NewBadRequestError("invalid id")
+	}
+
 	var item model.Item
 
 	if err := ctx.BodyParser(&item); err != nil {
@@ -90,7 +98,11 @@ func (c *ItemController) UpdateItemAmount(ctx *fiber.Ctx) error {
 }
 
 func (c *ItemController) DeleteItem(ctx *fiber.Ctx) error {
-	id := ctx.Params("id")
+	id, err := ctx.ParamsInt("id")
+	if err != nil {
+		return customErr.NewBadRequestError("invalid id")
+	}
+
 	if err := c.r.DeleteItem(id); err != nil {
 		return err
 	}
